@@ -26,9 +26,19 @@ A web application for booking home services with COVID-19 restrictions awareness
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB
-- Stripe Account (for payment processing)
+1. Node.js (v14 or higher)
+   - Download and install from [nodejs.org](https://nodejs.org/)
+   - Verify installation: `node --version`
+
+2. MongoDB
+   - Download and install [MongoDB Community Server](https://www.mongodb.com/try/download/community)
+   - Start MongoDB service
+   - Verify installation: `mongod --version`
+
+3. Stripe Account
+   - Sign up at [stripe.com](https://stripe.com)
+   - Get your API keys from the Stripe Dashboard
+   - Keep both Publishable and Secret keys handy
 
 ### Installation
 
