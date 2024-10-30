@@ -40,7 +40,7 @@ A web application for booking home services with COVID-19 restrictions awareness
    - Get your API keys from the Stripe Dashboard
    - Keep both Publishable and Secret keys handy
 
-### Installation
+### Installation (Based on Windows, which is the only OS I have access to)
 
 1. Clone the repository:
    ```bash
