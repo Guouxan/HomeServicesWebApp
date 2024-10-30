@@ -1,25 +1,26 @@
 # Home Services Web Application
 
-A web application for booking home services with COVID-19 restrictions awareness.
+A web application for booking home services with COVID-19 restrictions awareness, built with Next.js, Express, and MongoDB.
 
 ## Features
 
-- User Authentication (Register/Login)
-- Service Search and Filtering
-- Service Package Booking
-- Individual Service Booking
-- COVID-19 Restriction Checking based on Location
-- Secure Payment Processing with Stripe
-- Booking Management Dashboard
+- 🔐 User Authentication (Register/Login)
+- 🔍 Service Search and Filtering
+- 📦 Service Package Booking
+- 🏠 Individual Service Booking
+- 🦠 COVID-19 Restriction Checking based on Location
+- 💳 Secure Payment Processing with Stripe
+- 📱 Responsive Design
+- 📊 Booking Management Dashboard
 
 ## Tech Stack
 
-- Frontend: Next.js, React, Tailwind CSS
-- Backend: Node.js, Express
-- Database: MongoDB
-- Authentication: JWT
-- Payment: Stripe
-- Testing: Jest
+- **Frontend**: Next.js, React, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **Authentication**: JWT
+- **Payment**: Stripe
+- **Testing**: Jest
 
 ## Getting Started
 
@@ -31,4 +32,4 @@ A web application for booking home services with COVID-19 restrictions awareness
 
 ### Installation
 
-1. Clone the repository: 
+1. Clone the repository:

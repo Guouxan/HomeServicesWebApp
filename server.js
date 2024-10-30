@@ -21,6 +21,13 @@ app.use(cors({
 // Parse JSON bodies
 app.use(express.json());
 
+// Add these logs near the top after require('dotenv').config();
+console.log('Environment Check:');
+console.log('MongoDB URI:', process.env.MONGODB_URI);
+console.log('JWT Secret exists:', !!process.env.JWT_SECRET);
+console.log('Stripe Secret exists:', !!process.env.STRIPE_SECRET_KEY);
+console.log('Port:', process.env.PORT);
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000

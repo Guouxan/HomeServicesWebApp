@@ -36,66 +36,54 @@ const PaymentForm = ({ serviceId, amount, date, time }) => {
         return;
       }
 
-      // First create a booking
-      const bookingResponse = await axios.post(
-        'http://localhost:5000/api/bookings/create',
-        {
-          serviceId,
-          dateTime: `${date}T${time}`,
-          totalPrice: amount
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const bookingId = bookingResponse.data.booking._id;
-
       // Create payment intent
-      const { data } = await axios.post(
-        'http://localhost:5000/api/payments/create-payment-intent',
+      const { data: intentData } = await axios.post(
+        '/api/payments/create-payment-intent',
         { amount, serviceId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const { clientSecret } = data;
+      console.log('Payment Intent created:', intentData);
 
-      const result = await stripe.confirmCardPayment(clientSecret, {
+      const result = await stripe.confirmCardPayment(intentData.clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
         }
       });
 
       if (result.error) {
+        console.error('Payment error:', result.error);
         setError(result.error.message);
       } else {
         setError(null);
         setSucceeded(true);
         
         // Update booking status
-        await axios.post(
-          'http://localhost:5000/api/bookings/update-status',
-          {
-            bookingId,
-            status: 'confirmed',
-            paymentStatus: 'paid'
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        try {
+          await axios.post(
+            '/api/bookings/update-status',
+            {
+              serviceId,
+              status: 'confirmed',
+              paymentStatus: 'paid'
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
 
-        // Redirect to dashboard after successful payment
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000);
+          // Redirect to dashboard after successful payment
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 2000);
+        } catch (error) {
+          console.error('Error updating booking status:', error);
+        }
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment processing error:', error);
       setError(error.response?.data?.message || 'An error occurred during payment.');
     }
     setProcessing(false);
   };
-
-  if (!ready) {
-    return <div>Loading payment system...</div>;
-  }
 
   const cardStyle = {
     style: {
