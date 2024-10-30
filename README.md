@@ -120,5 +120,3 @@ A web application for booking home services with COVID-19 restrictions awareness
    - Allow location access when prompted
    - Test different locations in Adelaide suburbs
    - Observe different restriction levels
-
-[Rest of the README remains the same...]
