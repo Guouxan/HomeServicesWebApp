@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   const fetchBookings = async (token) => {
     try {
-      const response = await axios.get('/api/bookings/user', {
+      const response = await axios.get('http://localhost:5000/api/bookings/user', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(response.data);
@@ -30,6 +30,33 @@ export default function Dashboard() {
     } catch (error) {
       setError('Error fetching bookings');
       setLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:5000/api/bookings/update-status',
+        {
+          bookingId,
+          status: 'cancelled',
+          paymentStatus: 'refunded'
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setError('');
+      console.log('Cancellation successful:', response.data);
+      
+      fetchBookings(token);
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      setError(error.response?.data?.message || 'Failed to cancel booking');
+      
+      setTimeout(() => {
+        setError('');
+      }, 3000);
     }
   };
 
@@ -94,18 +121,46 @@ export default function Dashboard() {
                 {bookings.map((booking) => (
                   <li key={booking._id} className="p-4">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex-grow">
                         <h3 className="text-lg font-medium">
-                          {booking.service?.name || booking.servicePackage?.name}
+                          {booking.serviceName || 'Unnamed Service'}
                         </h3>
                         <p className="text-gray-500">
                           {new Date(booking.dateTime).toLocaleString()}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          Status: <span className="capitalize">{booking.status}</span>
-                        </p>
+                        <div className="mt-1 flex items-center space-x-2">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 
+                              booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                              booking.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'}`}>
+                            {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                          </span>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            ${booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' : 
+                              booking.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                              booking.paymentStatus === 'refunded' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'}`}>
+                            Payment: {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold">${booking.totalPrice}</p>
+                      <div className="text-right flex flex-col items-end">
+                        <p className="text-lg font-bold">${booking.totalPrice}</p>
+                        {booking.covidRestrictions && (
+                          <p className="text-sm text-red-600 mt-1 mb-2">
+                            {booking.covidRestrictions}
+                          </p>
+                        )}
+                        {booking.status !== 'cancelled' && (
+                          <button
+                            onClick={() => handleCancelBooking(booking._id)}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                          >
+                            Cancel Booking
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </li>
                 ))}

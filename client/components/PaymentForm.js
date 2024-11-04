@@ -58,14 +58,16 @@ const PaymentForm = ({ serviceId, amount, date, time }) => {
         setError(null);
         setSucceeded(true);
         
-        // Update booking status
+        // Update booking status using the backend endpoint directly
         try {
           await axios.post(
-            '/api/bookings/update-status',
+            'http://localhost:5000/api/bookings/update-status',
             {
               serviceId,
               status: 'confirmed',
-              paymentStatus: 'paid'
+              paymentStatus: 'paid',
+              dateTime: `${date}T${time}`,
+              amount: amount
             },
             { headers: { Authorization: `Bearer ${token}` } }
           );

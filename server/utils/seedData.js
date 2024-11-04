@@ -6,17 +6,18 @@ const ServicePackage = require('../models/ServicePackage');
 const generateAvailableDates = () => {
   const dates = [];
   const startDate = new Date();
-  // Generate dates for the next 30 days
-  for (let i = 1; i <= 30; i++) {
+  // Generate dates for the next 365 days (make it a full year)
+  for (let i = 1; i <= 365; i++) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
-    // Add multiple time slots for each date
-    ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'].forEach(time => {
-      const [hours, minutes] = time.split(':');
-      const dateWithTime = new Date(date);
-      dateWithTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      dates.push(dateWithTime);
-    });
+    // Add time slots from 8 AM to 8 PM
+    for (let hour = 8; hour <= 20; hour++) {
+      for (let minute of [0, 30]) { // Add 30-minute intervals
+        const dateWithTime = new Date(date);
+        dateWithTime.setHours(hour, minute, 0, 0);
+        dates.push(dateWithTime);
+      }
+    }
   }
   return dates;
 };
@@ -86,6 +87,34 @@ const services = [
     duration: 90,
     availableDates: generateAvailableDates(),
     covidRestrictions: "Social distancing required"
+  },
+  // Add new repair & maintenance services
+  {
+    name: "General Home Maintenance",
+    description: "Regular home maintenance including minor repairs, door/window fixes, and general upkeep",
+    category: "repair",
+    price: 85,
+    duration: 120,
+    availableDates: generateAvailableDates(),
+    covidRestrictions: "Masks required for indoor services"
+  },
+  {
+    name: "HVAC Service & Repair",
+    description: "Professional heating, ventilation, and air conditioning maintenance and repair",
+    category: "repair",
+    price: 120,
+    duration: 90,
+    availableDates: generateAvailableDates(),
+    covidRestrictions: "Indoor service with proper ventilation required"
+  },
+  {
+    name: "Appliance Repair",
+    description: "Expert repair service for household appliances including washers, dryers, dishwashers, and refrigerators",
+    category: "repair",
+    price: 95,
+    duration: 60,
+    availableDates: generateAvailableDates(),
+    covidRestrictions: "Social distancing and masks required"
   }
 ];
 
@@ -139,6 +168,21 @@ const seedDatabase = async () => {
         duration: 180,
         availableDates: generateAvailableDates(),
         covidRestrictions: "Masks required for all services"
+      },
+      // Add new package with repair services
+      {
+        name: "Home Repair Package",
+        description: "Comprehensive home repair and maintenance package",
+        services: [
+          { service: createdServices[7]._id, quantity: 1 }, // General Home Maintenance
+          { service: createdServices[8]._id, quantity: 1 }, // HVAC Service
+          { service: createdServices[9]._id, quantity: 1 }  // Appliance Repair
+        ],
+        price: 250,
+        discount: 15,
+        duration: 270,
+        availableDates: generateAvailableDates(),
+        covidRestrictions: "Masks and social distancing required for all services"
       }
     ];
 

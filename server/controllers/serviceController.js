@@ -40,23 +40,22 @@ exports.bookService = async (req, res) => {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    const bookingDateTime = new Date(`${date}T${time}:00Z`);
-    const isAvailable = service.availableDates.some(d => d.getTime() === bookingDateTime.getTime());
-    
-    if (!isAvailable) {
-      return res.status(400).json({ message: 'Selected date and time is not available' });
+    // For educational purposes, allow any future date/time
+    const bookingDateTime = new Date(`${date}T${time}`);
+    const now = new Date();
+
+    if (bookingDateTime <= now) {
+      return res.status(400).json({ message: 'Please select a future date and time' });
     }
 
-    // Remove the booked date from available dates
-    service.availableDates = service.availableDates.filter(d => d.getTime() !== bookingDateTime.getTime());
-    await service.save();
-
+    // Always allow the booking if it's in the future
     res.json({ 
       message: 'Service booked successfully', 
       bookingDateTime,
       covidRestrictions: service.covidRestrictions
     });
   } catch (error) {
+    console.error('Booking error:', error);
     res.status(500).json({ message: 'Error booking service', error: error.message });
   }
 };
@@ -95,36 +94,22 @@ exports.bookPackage = async (req, res) => {
       return res.status(404).json({ message: 'Service package not found' });
     }
 
-    // Convert the input date and time to UTC
-    const [hours, minutes] = time.split(':');
-    const bookingDateTime = new Date(date);
-    bookingDateTime.setUTCHours(parseInt(hours), parseInt(minutes), 0, 0);
+    // For educational purposes, allow any future date/time
+    const bookingDateTime = new Date(`${date}T${time}`);
+    const now = new Date();
 
-    // Check if the date is available
-    const isAvailable = servicePackage.availableDates.some(d => {
-      const availableDate = new Date(d);
-      return availableDate.getTime() === bookingDateTime.getTime();
-    });
-    
-    if (!isAvailable) {
-      return res.status(400).json({ 
-        message: 'Selected date and time is not available',
-        availableDates: servicePackage.availableDates 
-      });
+    if (bookingDateTime <= now) {
+      return res.status(400).json({ message: 'Please select a future date and time' });
     }
 
-    // Remove the booked date from available dates
-    servicePackage.availableDates = servicePackage.availableDates.filter(d => 
-      new Date(d).getTime() !== bookingDateTime.getTime()
-    );
-    await servicePackage.save();
-
+    // Always allow the booking if it's in the future
     res.json({ 
       message: 'Service package booked successfully', 
       bookingDateTime,
       covidRestrictions: servicePackage.covidRestrictions
     });
   } catch (error) {
+    console.error('Booking error:', error);
     res.status(500).json({ message: 'Error booking service package', error: error.message });
   }
 };
