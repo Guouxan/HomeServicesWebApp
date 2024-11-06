@@ -257,6 +257,41 @@ HomeServicesWebApp/
 
 ## Security Features
 
+### Interactive Security Demo
+The application includes a security testing page at `/security-demo` that demonstrates our security measures in action:
+
+1. **XSS (Cross-Site Scripting) Test**
+   - Payload: `<script>alert("XSS")</script>`
+   - Protection: Input sanitization and CSP headers
+   - Demo shows real-time blocking of malicious scripts
+
+2. **SQL Injection Test**
+   - Payload: `admin' OR '1'='1`
+   - Protection: Pattern matching and input validation
+   - Demonstrates prevention of database manipulation
+
+3. **Command Injection Test**
+   - Payload: `user; rm -rf /`
+   - Protection: Character filtering and input validation
+   - Shows blocking of dangerous system commands
+
+4. **DDoS Protection Test**
+   - Payload: 150 simultaneous requests
+   - Protection: Rate limiting (100 requests/15 minutes)
+   - Demonstrates request throttling
+
+5. **Large Payload Test**
+   - Payload: 11KB data (over 10KB limit)
+   - Protection: Request size limitations
+   - Shows prevention of memory exhaustion attacks
+
+Each test provides:
+- Detailed attack description
+- Actual payload used
+- Protection method explanation
+- Real-time test results
+- Visual success/failure indicators
+
 ### Authentication & Authorization
 - JWT-based authentication
 - Password hashing with bcrypt
