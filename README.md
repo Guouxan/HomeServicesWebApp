@@ -257,6 +257,12 @@ HomeServicesWebApp/
 
 ## Security Features
 
+### Authentication
+- JWT-based authentication
+- Password hashing with bcrypt
+- Token-based authorization
+- Secure password handling
+
 ### Interactive Security Demo
 The application includes a security testing page at `/security-demo` that demonstrates our security measures in action:
 
@@ -285,19 +291,6 @@ The application includes a security testing page at `/security-demo` that demons
    - Protection: Request size limitations
    - Shows prevention of memory exhaustion attacks
 
-Each test provides:
-- Detailed attack description
-- Actual payload used
-- Protection method explanation
-- Real-time test results
-- Visual success/failure indicators
-
-### Authentication & Authorization
-- JWT-based authentication
-- Password hashing with bcrypt
-- Session management
-- Role-based access control
-
 ### Protection Against Common Attacks
 1. **XSS (Cross-Site Scripting) Protection**
    - Input sanitization for all user inputs
@@ -314,7 +307,6 @@ Each test provides:
 3. **SQL/NoSQL Injection Protection**
    - MongoDB query sanitization
    - Input validation and sanitization
-   - Parameterized queries
    - Pattern matching for SQL commands
 
 4. **MITM (Man-in-the-Middle) Protection**
@@ -328,47 +320,6 @@ Each test provides:
    - Input validation
    - Pattern matching
    - Error handling
-
-### Security Middleware Implementation
-```javascript
-// Rate limiting configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
-
-// XSS Protection
-app.use(xssProtection);
-
-// SQL Injection Protection
-app.use(sqlInjectionProtection);
-
-// Command Injection Protection
-app.use(commandInjectionProtection);
-```
-
-### Recent Bug Fixes
-1. Fixed authentication middleware ordering
-   - Proper order of middleware execution
-   - Correct handling of request body parsing
-   - Fixed token validation
-
-2. Fixed XSS protection in form submissions
-   - Special handling for password fields
-   - Proper sanitization of nested objects
-   - Fixed input validation
-
-3. Fixed registration validation
-   - Age verification
-   - Email uniqueness check
-   - Password confirmation
-   - Required field validation
-
-4. Fixed security headers
-   - Updated Content Security Policy
-   - Added proper CORS headers
-   - Fixed HTTPS redirect
-   - Added XSS protection headers
 
 ### Security Best Practices
 1. Environment Variables
@@ -388,10 +339,10 @@ app.use(commandInjectionProtection);
    - Type checking
    - Size limitations
 
-4. Access Control
-   - Route protection
+4. Request Protection
+   - Route protection with JWT
    - Resource authorization
-   - Role-based access
-   - Session management
+   - Request validation
+   - Payload size limits
 
 
