@@ -255,4 +255,108 @@ HomeServicesWebApp/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## Security Features
+
+### Authentication & Authorization
+- JWT-based authentication
+- Password hashing with bcrypt
+- Session management
+- Role-based access control
+
+### Protection Against Common Attacks
+1. **XSS (Cross-Site Scripting) Protection**
+   - Input sanitization for all user inputs
+   - Content Security Policy (CSP) headers
+   - Special handling for password fields
+   - HTML encoding for dynamic content
+
+2. **DDoS Protection**
+   - Rate limiting (100 requests per 15 minutes)
+   - Request size limitations (10kb)
+   - IP-based request tracking
+   - Automatic blocking of suspicious IPs
+
+3. **SQL/NoSQL Injection Protection**
+   - MongoDB query sanitization
+   - Input validation and sanitization
+   - Parameterized queries
+   - Pattern matching for SQL commands
+
+4. **MITM (Man-in-the-Middle) Protection**
+   - Secure headers implementation
+   - HTTPS enforcement
+   - CORS configuration
+   - Content Security Policy
+
+5. **Command Injection Protection**
+   - Dangerous character filtering
+   - Input validation
+   - Pattern matching
+   - Error handling
+
+### Security Middleware Implementation
+```javascript
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+// XSS Protection
+app.use(xssProtection);
+
+// SQL Injection Protection
+app.use(sqlInjectionProtection);
+
+// Command Injection Protection
+app.use(commandInjectionProtection);
+```
+
+### Recent Bug Fixes
+1. Fixed authentication middleware ordering
+   - Proper order of middleware execution
+   - Correct handling of request body parsing
+   - Fixed token validation
+
+2. Fixed XSS protection in form submissions
+   - Special handling for password fields
+   - Proper sanitization of nested objects
+   - Fixed input validation
+
+3. Fixed registration validation
+   - Age verification
+   - Email uniqueness check
+   - Password confirmation
+   - Required field validation
+
+4. Fixed security headers
+   - Updated Content Security Policy
+   - Added proper CORS headers
+   - Fixed HTTPS redirect
+   - Added XSS protection headers
+
+### Security Best Practices
+1. Environment Variables
+   - Sensitive data stored in .env files
+   - Different configurations for development/production
+   - Secure key management
+
+2. Error Handling
+   - Custom error messages
+   - Sanitized error responses
+   - Proper logging
+   - Development/Production error differentiation
+
+3. Input Validation
+   - Server-side validation
+   - Client-side validation
+   - Type checking
+   - Size limitations
+
+4. Access Control
+   - Route protection
+   - Resource authorization
+   - Role-based access
+   - Session management
+
 

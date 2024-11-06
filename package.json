@@ -14,12 +14,18 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.21.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.2",
     "next": "^15.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "stripe": "^17.3.0"
+    "stripe": "^17.3.0",
+    "xss": "^1.0.15",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.9",
