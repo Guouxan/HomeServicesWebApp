@@ -123,36 +123,64 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             <div>
               <h4 className="text-lg font-bold mb-4">HomeServices</h4>
               <p className="text-gray-400">Your trusted platform for home services</p>
             </div>
             <div>
-              <h4 className="text-lg font-bold mb-4">Services</h4>
-              <ul className="text-gray-400">
-                <li className="mb-2">Cleaning</li>
-                <li className="mb-2">Plumbing</li>
-                <li className="mb-2">Electrical</li>
-                <li className="mb-2">Gardening</li>
-              </ul>
-            </div>
-            <div>
               <h4 className="text-lg font-bold mb-4">Company</h4>
               <ul className="text-gray-400">
-                <li className="mb-2">About Us</li>
-                <li className="mb-2">Contact</li>
-                <li className="mb-2">Careers</li>
-                <li className="mb-2">Blog</li>
+                <li className="mb-2">
+                  <Link href="/contact" className="hover:text-white transition-colors">
+                    Contact
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-bold mb-4">Connect</h4>
               <ul className="text-gray-400">
-                <li className="mb-2">Facebook</li>
-                <li className="mb-2">Twitter</li>
-                <li className="mb-2">Instagram</li>
-                <li className="mb-2">LinkedIn</li>
+                <li className="mb-2">
+                  <a 
+                    href="https://facebook.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Facebook
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a 
+                    href="https://twitter.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Twitter
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a 
+                    href="https://instagram.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Instagram
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a 
+                    href="https://linkedin.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    LinkedIn
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
