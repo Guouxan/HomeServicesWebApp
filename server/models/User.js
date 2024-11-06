@@ -6,8 +6,27 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   password: { type: String, required: true },
+  age: { type: Number, required: true },
+  citizenship: { type: String, required: true },
+  preferredLanguage: { 
+    type: String, 
+    required: true,
+    enum: ['English', 'Mandarin', 'Hindi', 'Spanish', 'Arabic']
+  },
+  covidVaccinated: { 
+    type: String, 
+    required: true,
+    enum: ['Yes', 'No', 'Prefer not to say']
+  },
+  address: {
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    postcode: { type: String, required: true }
+  },
   googleId: String,
-  facebookId: String
+  facebookId: String,
+  createdAt: { type: Date, default: Date.now }
 });
 
 UserSchema.pre('save', async function(next) {

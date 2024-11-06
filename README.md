@@ -4,7 +4,16 @@ A web application for booking home services with COVID-19 restrictions awareness
 
 ## Features
 
-- 🔐 User Authentication (Register/Login)
+- 🔐 Enhanced User Authentication
+  - Comprehensive user registration with:
+    - Personal details (name, age, citizenship)
+    - Contact information (email, phone)
+    - Address details
+    - Language preference
+    - COVID-19 vaccination status
+  - Secure login system
+  - JWT-based authentication
+  - User profile management
 - 🔍 Service Search and Filtering
 - 📦 Service Package Booking
 - 🏠 Individual Service Booking
@@ -166,6 +175,59 @@ A web application for booking home services with COVID-19 restrictions awareness
    - HVAC Service
    - Appliance Repair
    - 15% discount
+
+### User Registration Fields
+
+The application collects the following information during registration:
+- Full Name
+- Age (must be 18 or older)
+- Country of Citizenship
+- Email Address
+- Phone Number
+- Full Address (street, city, state, postcode)
+- Preferred Language (English, Mandarin, Hindi, Spanish, Arabic)
+- COVID-19 Vaccination Status
+- Secure Password
+
+### Authentication Flow
+
+1. Registration:
+   ```bash
+   POST /api/auth/register
+   # Required fields in request body:
+   {
+     "name": "string",
+     "email": "string",
+     "phone": "string",
+     "password": "string",
+     "age": "number",
+     "citizenship": "string",
+     "preferredLanguage": "string",
+     "covidVaccinated": "string",
+     "address": {
+       "street": "string",
+       "city": "string",
+       "state": "string",
+       "postcode": "string"
+     }
+   }
+   ```
+
+2. Login:
+   ```bash
+   POST /api/auth/login
+   # Required fields in request body:
+   {
+     "email": "string",
+     "password": "string"
+   }
+   ```
+
+3. Get User Profile:
+   ```bash
+   GET /api/auth/profile
+   # Requires Authorization header with JWT token
+   ```
 
 ## Project Structure
 
