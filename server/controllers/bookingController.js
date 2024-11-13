@@ -45,21 +45,37 @@ exports.getUserBookings = async (req, res) => {
       })
       .populate({
         path: 'servicePackage',
-        select: 'name price duration covidRestrictions discount'
+        select: 'name price duration covidRestrictions services discount',
+        populate: {
+          path: 'services.service',
+          select: 'name'
+        }
       })
-      .sort({ createdAt: -1 });
+      .sort({ dateTime: -1 });
+
+    console.log('Found bookings:', JSON.stringify(bookings, null, 2));
 
     // Format the bookings data
-    const formattedBookings = bookings.map(booking => ({
-      _id: booking._id,
-      serviceName: booking.service ? booking.service.name : booking.servicePackage?.name,
-      dateTime: booking.dateTime,
-      status: booking.status,
-      totalPrice: booking.totalPrice,
-      paymentStatus: booking.paymentStatus,
-      covidRestrictions: booking.service ? booking.service.covidRestrictions : booking.servicePackage?.covidRestrictions
-    }));
+    const formattedBookings = bookings.map(booking => {
+      console.log('Processing booking:', booking);
+      
+      return {
+        _id: booking._id,
+        serviceName: booking.service?.name || booking.servicePackage?.name || 'Unnamed Service',
+        price: booking.totalPrice,
+        duration: booking.service?.duration || booking.servicePackage?.duration,
+        covidRestrictions: booking.service?.covidRestrictions || booking.servicePackage?.covidRestrictions,
+        services: booking.servicePackage?.services.map(s => s.service.name).join(', '),
+        dateTime: booking.dateTime,
+        status: booking.status,
+        paymentStatus: booking.paymentStatus,
+        isPackage: !!booking.servicePackage,
+        discount: booking.servicePackage?.discount || 0,
+        createdAt: booking.createdAt
+      };
+    });
 
+    console.log('Formatted bookings:', JSON.stringify(formattedBookings, null, 2));
     res.json(formattedBookings);
   } catch (error) {
     console.error('Error fetching bookings:', error);
@@ -69,60 +85,66 @@ exports.getUserBookings = async (req, res) => {
 
 exports.updateBookingStatus = async (req, res) => {
   try {
-    const { serviceId, packageId, status, paymentStatus, dateTime, totalPrice } = req.body;
+    const { bookingId, serviceId, packageId, status, paymentStatus, dateTime, totalPrice } = req.body;
     
-    // Find existing booking or create new one
-    let booking;
-    if (serviceId) {
-      booking = await Booking.findOne({ 
-        service: serviceId,
-        user: req.user.id,
-        dateTime: new Date(dateTime)
+    // If updating existing booking
+    if (bookingId) {
+      const booking = await Booking.findOne({ 
+        _id: bookingId,
+        user: req.user.id
       });
 
       if (!booking) {
-        booking = new Booking({
-          service: serviceId,
-          user: req.user.id,
-          dateTime: new Date(dateTime),
-          status,
-          paymentStatus,
-          totalPrice
-        });
+        return res.status(404).json({ message: 'Booking not found' });
       }
-    } else if (packageId) {
-      booking = await Booking.findOne({ 
-        servicePackage: packageId,
-        user: req.user.id,
-        dateTime: new Date(dateTime)
+
+      // Check if booking is already cancelled
+      if (booking.status === 'cancelled') {
+        return res.status(400).json({ message: 'Booking is already cancelled' });
+      }
+
+      // Check if booking is already completed
+      if (booking.status === 'completed') {
+        return res.status(400).json({ message: 'Cannot cancel a completed booking' });
+      }
+
+      // Update booking status
+      booking.status = status;
+      booking.paymentStatus = paymentStatus;
+      await booking.save();
+
+      return res.json({ 
+        message: status === 'cancelled' ? 'Booking cancelled successfully' : 'Booking status updated successfully', 
+        booking 
       });
-
-      if (!booking) {
-        booking = new Booking({
-          servicePackage: packageId,
-          user: req.user.id,
-          dateTime: new Date(dateTime),
-          status,
-          paymentStatus,
-          totalPrice
-        });
-      }
-    } else {
-      return res.status(400).json({ message: 'Either serviceId or packageId is required' });
     }
 
-    // Update status and totalPrice if it's an existing booking
-    booking.status = status;
-    booking.paymentStatus = paymentStatus;
-    if (totalPrice) {
-      booking.totalPrice = totalPrice;
+    // If creating new booking
+    if (!dateTime || !totalPrice) {
+      return res.status(400).json({ message: 'DateTime and totalPrice are required for new bookings' });
     }
 
-    await booking.save();
+    // Create new booking
+    const newBooking = new Booking({
+      user: req.user.id,
+      service: serviceId || null,
+      servicePackage: packageId || null,
+      dateTime: new Date(dateTime),
+      status,
+      paymentStatus,
+      totalPrice
+    });
+
+    await newBooking.save();
+
+    // Populate the booking with service/package details
+    const populatedBooking = await Booking.findById(newBooking._id)
+      .populate('service')
+      .populate('servicePackage');
 
     res.json({ 
-      message: 'Booking status updated successfully', 
-      booking 
+      message: 'Booking created successfully', 
+      booking: populatedBooking 
     });
   } catch (error) {
     console.error('Error updating booking status:', error);

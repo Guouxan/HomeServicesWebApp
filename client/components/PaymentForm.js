@@ -39,7 +39,11 @@ const PaymentForm = ({ serviceId, packageId, amount, date, time }) => {
       // Create payment intent
       const { data: intentData } = await axios.post(
         'http://localhost:5000/api/payments/create-payment-intent',
-        { amount, serviceId: serviceId || packageId },
+        { 
+          amount,
+          serviceId: serviceId || null,
+          packageId: packageId || null
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -55,20 +59,26 @@ const PaymentForm = ({ serviceId, packageId, amount, date, time }) => {
         setError(null);
         setSucceeded(true);
         
-        // Update booking status
+        // Create or update booking
         try {
-          await axios.post(
+          const bookingData = {
+            serviceId: serviceId || null,
+            packageId: packageId || null,
+            status: 'confirmed',
+            paymentStatus: 'paid',
+            dateTime: `${date}T${time}`,
+            totalPrice: amount
+          };
+
+          console.log('Sending booking update:', bookingData);
+
+          const response = await axios.post(
             'http://localhost:5000/api/bookings/update-status',
-            {
-              serviceId: serviceId || null,
-              packageId: packageId || null,
-              status: 'confirmed',
-              paymentStatus: 'paid',
-              dateTime: `${date}T${time}`,
-              totalPrice: amount
-            },
+            bookingData,
             { headers: { Authorization: `Bearer ${token}` } }
           );
+
+          console.log('Booking response:', response.data);
 
           // Redirect to dashboard after successful payment
           setTimeout(() => {
@@ -76,6 +86,7 @@ const PaymentForm = ({ serviceId, packageId, amount, date, time }) => {
           }, 2000);
         } catch (error) {
           console.error('Error updating booking status:', error);
+          setError('Payment successful but booking update failed. Please contact support.');
         }
       }
     } catch (error) {
