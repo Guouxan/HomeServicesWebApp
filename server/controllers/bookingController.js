@@ -69,86 +69,67 @@ exports.getUserBookings = async (req, res) => {
 
 exports.updateBookingStatus = async (req, res) => {
   try {
-    const { bookingId, status, paymentStatus, dateTime, amount } = req.body;
+    const { serviceId, packageId, status, paymentStatus, dateTime, totalPrice } = req.body;
     
-    // If bookingId is provided, update existing booking
-    if (bookingId) {
-      const booking = await Booking.findOne({ 
-        _id: bookingId,
-        user: req.user.id
-      }).populate('service servicePackage');
+    // Find existing booking or create new one
+    let booking;
+    if (serviceId) {
+      booking = await Booking.findOne({ 
+        service: serviceId,
+        user: req.user.id,
+        dateTime: new Date(dateTime)
+      });
 
       if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
+        booking = new Booking({
+          service: serviceId,
+          user: req.user.id,
+          dateTime: new Date(dateTime),
+          status,
+          paymentStatus,
+          totalPrice
+        });
       }
-
-      // Check if the booking can be cancelled
-      if (status === 'cancelled') {
-        const bookingDate = new Date(booking.dateTime);
-        const now = new Date();
-        const hoursDifference = (bookingDate - now) / (1000 * 60 * 60);
-
-        // For educational purposes, allow cancellation at any time
-        // Remove the 24-hour restriction
-        /*
-        if (hoursDifference < 24) {
-          return res.status(400).json({ 
-            message: 'Bookings can only be cancelled at least 24 hours before the service time' 
-          });
-        }
-        */
-
-        // Check if booking is already cancelled
-        if (booking.status === 'cancelled') {
-          return res.status(400).json({ message: 'Booking is already cancelled' });
-        }
-
-        // Check if booking is already completed
-        if (booking.status === 'completed') {
-          return res.status(400).json({ message: 'Cannot cancel a completed booking' });
-        }
-      }
-
-      booking.status = status;
-      booking.paymentStatus = paymentStatus;
-      await booking.save();
-
-      // Format the response data
-      const formattedBooking = {
-        _id: booking._id,
-        serviceName: booking.service ? booking.service.name : booking.servicePackage?.name,
-        dateTime: booking.dateTime,
-        status: booking.status,
-        totalPrice: booking.totalPrice,
-        paymentStatus: booking.paymentStatus,
-        covidRestrictions: booking.service ? booking.service.covidRestrictions : booking.servicePackage?.covidRestrictions
-      };
-
-      return res.json({ 
-        message: status === 'cancelled' ? 'Booking cancelled successfully' : 'Booking status updated successfully', 
-        booking: formattedBooking
+    } else if (packageId) {
+      booking = await Booking.findOne({ 
+        servicePackage: packageId,
+        user: req.user.id,
+        dateTime: new Date(dateTime)
       });
+
+      if (!booking) {
+        booking = new Booking({
+          servicePackage: packageId,
+          user: req.user.id,
+          dateTime: new Date(dateTime),
+          status,
+          paymentStatus,
+          totalPrice
+        });
+      }
+    } else {
+      return res.status(400).json({ message: 'Either serviceId or packageId is required' });
     }
 
-    // Create new booking if no bookingId provided
-    if (!dateTime || !amount) {
-      return res.status(400).json({ message: 'DateTime and amount are required for new bookings' });
+    // Update status and totalPrice if it's an existing booking
+    booking.status = status;
+    booking.paymentStatus = paymentStatus;
+    if (totalPrice) {
+      booking.totalPrice = totalPrice;
     }
 
-    const newBooking = new Booking({
-      service: serviceId,
-      user: req.user.id,
-      dateTime: new Date(dateTime),
-      status,
-      paymentStatus,
-      totalPrice: amount
+    await booking.save();
+
+    res.json({ 
+      message: 'Booking status updated successfully', 
+      booking 
     });
-    await newBooking.save();
-    
-    res.json({ message: 'Booking created and status updated successfully', booking: newBooking });
   } catch (error) {
     console.error('Error updating booking status:', error);
-    res.status(500).json({ message: 'Error updating booking status', error: error.message });
+    res.status(500).json({ 
+      message: 'Error updating booking status', 
+      error: error.message 
+    });
   }
 };
 

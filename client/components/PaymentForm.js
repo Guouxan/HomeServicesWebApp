@@ -3,7 +3,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import axios from '../config/axios';
 import { useRouter } from 'next/router';
 
-const PaymentForm = ({ serviceId, amount, date, time }) => {
+const PaymentForm = ({ serviceId, packageId, amount, date, time }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
@@ -38,12 +38,10 @@ const PaymentForm = ({ serviceId, amount, date, time }) => {
 
       // Create payment intent
       const { data: intentData } = await axios.post(
-        '/api/payments/create-payment-intent',
-        { amount, serviceId },
+        'http://localhost:5000/api/payments/create-payment-intent',
+        { amount, serviceId: serviceId || packageId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log('Payment Intent created:', intentData);
 
       const result = await stripe.confirmCardPayment(intentData.clientSecret, {
         payment_method: {
@@ -52,22 +50,22 @@ const PaymentForm = ({ serviceId, amount, date, time }) => {
       });
 
       if (result.error) {
-        console.error('Payment error:', result.error);
         setError(result.error.message);
       } else {
         setError(null);
         setSucceeded(true);
         
-        // Update booking status using the backend endpoint directly
+        // Update booking status
         try {
           await axios.post(
             'http://localhost:5000/api/bookings/update-status',
             {
-              serviceId,
+              serviceId: serviceId || null,
+              packageId: packageId || null,
               status: 'confirmed',
               paymentStatus: 'paid',
               dateTime: `${date}T${time}`,
-              amount: amount
+              totalPrice: amount
             },
             { headers: { Authorization: `Bearer ${token}` } }
           );
